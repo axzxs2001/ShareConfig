@@ -7,7 +7,7 @@ namespace ConsulShareConfig
     /// <summary>
     /// Create Update Key Parmeter
     /// </summary>
-    public class CreateUpdateKeyParmeter
+    class CreateUpdateKeyParmeter
     {
         /// <summary>
         /// Specifies the path of the key to read.

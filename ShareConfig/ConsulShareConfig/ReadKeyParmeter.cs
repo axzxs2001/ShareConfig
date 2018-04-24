@@ -7,7 +7,7 @@ namespace ConsulShareConfig
     /// <summary>
     /// Read Key Parmeter
     /// </summary>
-    public class ReadKeyParmeter
+    class ReadKeyParmeter
     {
         /// <summary>
         /// Specifies the path of the key to read.

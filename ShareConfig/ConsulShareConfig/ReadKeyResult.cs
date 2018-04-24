@@ -7,7 +7,7 @@ namespace ConsulShareConfig
     /// <summary>
     /// Read Key Result
     /// </summary>
-    public class ReadKeyResult
+    class ReadKeyResult
     {
         /// <summary>
         /// CreateIndex

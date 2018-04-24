@@ -14,20 +14,26 @@ namespace ConsulShareConfig
     /// </summary>
     public class ConsulConfig : IConfig
     {
-        string _urlPrefix = "v1";  
+        string _urlPrefix = "v1";
         HttpClient _client;
         /// <summary>
         /// ctor
         /// </summary>
-        /// <param name="baseAddress">Base Address</param>
-        public ConsulConfig(string baseAddress)
-        {          
+        /// <param name="baseAddress">Base Address，Default value is "http://localhost:8500"</param>
+        public ConsulConfig(string baseAddress = "http://localhost:8500")
+        {
             _client = new HttpClient();
             _client.BaseAddress = new Uri($"{baseAddress}");
         }
+        /// <summary>
+        /// Read Config
+        /// </summary>
+        /// <typeparam name="T">configuration value type</typeparam>
+        /// <param name="key">configuration key</param>
+        /// <returns></returns>
         public async Task<List<T>> Read<T>(Key key) where T : class, new()
         {
-            var list =await ReadKey(new ReadKeyParmeter { DC = null, Key = key.ToString() });
+            var list = await ReadKey<ReadKeyResult>(new ReadKeyParmeter { DC = null, Key = key.ToString() });
             var backList = new List<T>();
             if (list != null)
             {
@@ -39,15 +45,37 @@ namespace ConsulShareConfig
             return backList;
         }
 
+        public async Task<List<string>> ReadKeyList(Key key)
+        {
+            var list = await ReadKey<string>(new ReadKeyParmeter { DC = null, Key = key.ToString(), Recurse = true, Raw = true, Keys = true, Separator = "/" });
+            var backList = new List<string>();
+            if (list != null)
+            {
+                backList.AddRange(list);
+            }
+            return backList;
+        }
+
+        /// <summary>
+        /// write config
+        /// </summary>
+        /// <typeparam name="T">configuration value type</typeparam>
+        /// <param name="key">configuration key</param>
+        /// <param name="value">configuration value</param>
+        /// <returns></returns>
         public async Task<bool> Write<T>(Key key, T value) where T : class, new()
         {
-            var result =await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = key.ToString(), DC = null }, value);
+            var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = key.ToString(), DC = null }, value);
             return result.result && result.createUpdateResult;
         }
-     
+        /// <summary>
+        /// remove config
+        /// </summary>
+        /// <param name="key">configuration key</param>
+        /// <returns></returns>
         public async Task<bool> Remove(Key key)
         {
-            var result =await DeleteKey(new DeleteKeyParmeter { Key = key.ToString() });
+            var result = await DeleteKey(new DeleteKeyParmeter { Key = key.ToString() });
             return result.result && result.deleteResult;
         }
 
@@ -56,22 +84,21 @@ namespace ConsulShareConfig
         /// </summary>
         /// <param name="readKeyParmeter">Read Key Parmeter</param>
         /// <returns></returns>
-        async Task<ReadKeyResult[]> ReadKey(ReadKeyParmeter readKeyParmeter)
+        async Task<W[]> ReadKey<W>(ReadKeyParmeter readKeyParmeter)
         {
-      
             var url = $"/kv/{readKeyParmeter.Key}";
             var parString = GetUrlParmeter<ReadKeyParmeter>(readKeyParmeter);
             if (!string.IsNullOrEmpty(parString))
             {
                 url += $"?{parString}";
             }
-            var response = await _client.GetAsync($"/{_urlPrefix}/{url}");
+            var response = await _client.GetAsync($"/{_urlPrefix}/{url.ToLower()}");
             var json = await response.Content.ReadAsStringAsync();
             if (!string.IsNullOrEmpty(json))
             {
                 try
                 {
-                    var entity = JsonConvert.DeserializeObject<ReadKeyResult[]>(json);
+                    var entity = JsonConvert.DeserializeObject<W[]>(json);
                     return entity;
                 }
                 catch (JsonReaderException)
@@ -84,21 +111,32 @@ namespace ConsulShareConfig
                 return null;
             }
         }
-        string GetUrlParmeter<W>(W inEntity) where W : class, new()
+
+       /// <summary>
+       /// get in parmeter with url
+       /// </summary>
+       /// <typeparam name="W"></typeparam>
+       /// <param name="inEntity"></param>
+       /// <returns></returns>
+        string GetUrlParmeter<T>(T inEntity) where T : class, new()
         {
             var parmeterString = new StringBuilder();
             foreach (var pro in inEntity.GetType().GetProperties())
             {
-                //if ((pro.GetValue(inEntity, null)) != pro.PropertyType.)
+                //get property value
+                var entityValue = pro.GetValue(inEntity);              
+                if (!pro.PropertyType.IsValueType&&entityValue == null)
                 {
-                    var proName = pro.Name;
-                    var atts = pro.GetCustomAttributes(typeof(FieldNameAttribute), false);
-                    if (atts.Length > 0)
-                    {
-                        proName = (atts[0] as FieldNameAttribute).ChangeFieldName;
-                    }
-                    parmeterString.Append($"{proName}={pro.GetValue(inEntity, null)}&");
+                    continue;                   
                 }
+                else
+                {
+                    if (entityValue.ToString() == Activator.CreateInstance(pro.PropertyType).ToString())
+                    {
+                        continue;
+                    }
+                }                       
+                parmeterString.Append($"{pro.Name}={pro.GetValue(inEntity)}&");
             }
             return parmeterString.ToString().Trim('&');
         }
@@ -109,7 +147,7 @@ namespace ConsulShareConfig
         /// <param name="value">value</param>
         /// <returns></returns>
         async Task<(bool result, bool createUpdateResult)> CreateUpdateKey(CreateUpdateKeyParmeter createUpdateKeyParmeter, object value)
-        {        
+        {
             var url = $"/kv/{createUpdateKeyParmeter.Key}";
             var parString = GetUrlParmeter<CreateUpdateKeyParmeter>(createUpdateKeyParmeter);
             if (!string.IsNullOrEmpty(parString))
@@ -136,7 +174,7 @@ namespace ConsulShareConfig
         /// <param name="deleteKeyParmeter">Delete Key Parmeter</param>
         /// <returns></returns>
         async Task<(bool result, bool deleteResult)> DeleteKey(DeleteKeyParmeter deleteKeyParmeter)
-        {           
+        {
             var url = $"/kv/{deleteKeyParmeter.Key}";
             var parString = GetUrlParmeter<DeleteKeyParmeter>(deleteKeyParmeter);
             if (!string.IsNullOrEmpty(parString))

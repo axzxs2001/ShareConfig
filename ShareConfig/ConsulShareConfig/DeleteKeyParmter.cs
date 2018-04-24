@@ -7,7 +7,7 @@ namespace ConsulShareConfig
     /// <summary>
     /// Delete Key Parmter
     /// </summary>
-    public class DeleteKeyParmeter
+    class DeleteKeyParmeter
     {
         /// <summary>
         /// Specifies the path of the key to delete.
