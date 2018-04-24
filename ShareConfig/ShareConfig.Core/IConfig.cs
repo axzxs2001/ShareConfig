@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ShareConfig.Core
 {
@@ -15,21 +16,21 @@ namespace ShareConfig.Core
         /// <param name="key">configration key</param>
         /// <param name="value">configration value</param>
         /// <returns></returns>
-        bool Write<T>(Key key, T value) where T:class,new();
-        /// <summary>
-        /// write the batch configuration item
-        /// </summary>
-        /// <typeparam name="T">configration value type</typeparam>
-        /// <param name="configs">batch configuration</param>
-        /// <returns></returns>
-        bool Writes<T>(Dictionary<Key, T> configs) where T : class, new();
+        Task<bool> Write<T>(Key key, T value) where T : class, new();
         /// <summary>
         /// batch read the configuration items.
         /// </summary>
         /// <typeparam name="T">configration value type</typeparam>
         /// <param name="key">configration key</param>
         /// <returns></returns>
-        List<T> Read<T>(Key key) where T : class, new();
+        Task<List<T>> Read<T>(Key key) where T : class, new();
+
+        /// <summary>
+        /// remove configuration
+        /// </summary>
+        /// <param name="key">configration key</param>
+        /// <returns></returns>
+        Task<bool> Remove(Key key);
 
     }
 }

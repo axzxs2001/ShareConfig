@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareConfig.Core", "ShareCo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsulShareConfig", "ConsulShareConfig\ConsulShareConfig.csproj", "{FCBDC0CF-35FC-483D-BFD2-927DA1AEE56A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleSample", "ConsoleSample\ConsoleSample.csproj", "{88DB26CF-25DE-41B9-9353-0F70A4A642BE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FCBDC0CF-35FC-483D-BFD2-927DA1AEE56A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCBDC0CF-35FC-483D-BFD2-927DA1AEE56A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FCBDC0CF-35FC-483D-BFD2-927DA1AEE56A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88DB26CF-25DE-41B9-9353-0F70A4A642BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88DB26CF-25DE-41B9-9353-0F70A4A642BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88DB26CF-25DE-41B9-9353-0F70A4A642BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88DB26CF-25DE-41B9-9353-0F70A4A642BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
