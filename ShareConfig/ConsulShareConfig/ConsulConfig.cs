@@ -17,6 +17,15 @@ namespace ConsulShareConfig
     {
         string _urlPrefix = "v1";
         HttpClient _client;
+
+        /// <summary>
+        /// ctor
+        /// </summary>
+        public ConsulConfig()
+        {
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri($"http://localhost:8500");
+        }
         /// <summary>
         /// ctor
         /// </summary>

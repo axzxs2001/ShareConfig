@@ -9,17 +9,21 @@ namespace ShareConfig.Core
     /// </summary>
     public interface IDataPersistence
     {
+       
         /// <summary>
-        /// read all configs from database
+        /// read all config from database
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Dictionary<Key, dynamic> ReadConfigs();
+        Dictionary<Key, T> ReadConfigs<T>() where T:class,new();
+    
 
         /// <summary>
-        /// write all configs to database
+        /// write all config to database
         /// </summary>
-        /// <param name="configs"></param>
+        /// <typeparam name="T">configruation value type</typeparam>
+        /// <param name="configs">all config</param>
         /// <returns></returns>
-        bool WriteConfigs(Dictionary<Key, dynamic> configs);
+        bool WriteConfigs<T>(Dictionary<Key, T> configs) where T : class, new();
     }
 }

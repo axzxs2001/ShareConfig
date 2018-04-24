@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsulShareConfig", "Consul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleSample", "ConsoleSample\ConsoleSample.csproj", "{88DB26CF-25DE-41B9-9353-0F70A4A642BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareConfig.DataPersistence.SqlServer", "ShareConfig.DataPersistence.SqlServer\ShareConfig.DataPersistence.SqlServer.csproj", "{1F0C0AFB-C3D3-4D8D-9B8F-FBC0D40357CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{88DB26CF-25DE-41B9-9353-0F70A4A642BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88DB26CF-25DE-41B9-9353-0F70A4A642BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88DB26CF-25DE-41B9-9353-0F70A4A642BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F0C0AFB-C3D3-4D8D-9B8F-FBC0D40357CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F0C0AFB-C3D3-4D8D-9B8F-FBC0D40357CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F0C0AFB-C3D3-4D8D-9B8F-FBC0D40357CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F0C0AFB-C3D3-4D8D-9B8F-FBC0D40357CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
