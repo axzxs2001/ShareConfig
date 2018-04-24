@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Threading.Tasks;
-
+using System.Text.RegularExpressions;
 namespace ConsoleSample
 {
     internal class Program
     {
         static async Task Main(string[] args)
         {
+
+            //var reg = new Regex("^abc/([\\w.]*)/([\\w*.]*)/a$");
+            //Console.WriteLine(reg.IsMatch("abc/pro/1.0/a"));
+
+            //return;
             var config = new ConsulShareConfig.ConsulConfig("http://localhost:8500");
             while (true)
             {
@@ -14,12 +19,21 @@ namespace ConsoleSample
                 switch (Console.ReadLine())
                 {
                     case "1":
+
+                        Console.WriteLine("请输入Environment");
+                        var addEnvironment = Console.ReadLine();
+
+                        Console.WriteLine("请输入Version");
+                        var addVersion = Console.ReadLine();
+
                         Console.WriteLine("请输入Tag");
                         var addtab = Console.ReadLine();
-                        var addResult = await config.Write<ABC>(new ShareConfig.Core.Key { Environment = "pro", NameSpace = "abc", Version = "1.0", Tag = addtab }, new ABC { Name = "ggg_"+addtab, Sex = true });
+
+                        var key = new ShareConfig.Core.Key { NameSpace = "abc", Environment = addEnvironment, Version = addVersion, Tag = addtab };
+                        var addResult = await config.Write<ABC>(key, new ABC { Name = "ggg_" + key.ToString(), Sex = true });
                         Console.WriteLine($"add result:{addResult}");
                         break;
-            
+
                     case "2":
                         Console.WriteLine("请输入Tag");
                         var writetab = Console.ReadLine();
@@ -32,18 +46,16 @@ namespace ConsoleSample
                         Console.WriteLine("====================================");
                         break;
                     case "3":
-                        Console.WriteLine("请输入Tag");
-                        var querykeytab = Console.ReadLine();
-                        var keylist = await config.ReadKeyList(new ShareConfig.Core.Key { Environment = "pro", NameSpace = "abc", Version = "1.0", Tag = querykeytab });
+                        var keylist = await config.Read<ABC>(new ShareConfig.Core.Key { NameSpace = "abc", Version = "1.0",Tag="aaa" });
                         Console.WriteLine("================数据================");
                         foreach (var item in keylist)
                         {
-                            Console.WriteLine($"{item}");
+                            Console.WriteLine($"{item.Name},{item.Sex}");
                         }
                         Console.WriteLine("====================================");
                         break;
                     case "4":
-                        var removeResult = await config.Remove(new ShareConfig.Core.Key { Environment = "pro", NameSpace = "abc", Version = "1.0", Tag = "abc" });
+                        var removeResult = await config.Remove(new ShareConfig.Core.Key { NameSpace = "abc",Version="1.0"});
                         Console.WriteLine($"remove result:{removeResult}");
                         break;
                 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ConsulShareConfig
@@ -33,28 +34,48 @@ namespace ConsulShareConfig
         /// <returns></returns>
         public async Task<List<T>> Read<T>(Key key) where T : class, new()
         {
-            var list = await ReadKey<ReadKeyResult>(new ReadKeyParmeter { DC = null, Key = key.ToString() });
+            var keyString = key.ToString();
+            var keyStrArr = keyString.Split(new string[] { Key.RegxString }, StringSplitOptions.RemoveEmptyEntries);
             var backList = new List<T>();
-            if (list != null)
+            if (keyStrArr.Length > 0)
             {
+                var list = new List<ReadKeyResult>();
+                list.AddRange(await ReadKey(keyStrArr[0]));
                 foreach (var item in list)
                 {
-                    backList.Add(JsonConvert.DeserializeObject<T>(item.DecodeValue));
+                    var reg = new Regex($"^{keyString}$");
+                    if (reg.IsMatch(item.Key))
+                    {
+                        backList.Add(JsonConvert.DeserializeObject<T>(item.DecodeValue));
+                    }
                 }
             }
+
             return backList;
         }
 
-        public async Task<List<string>> ReadKeyList(Key key)
+        async Task<List<ReadKeyResult>> ReadKey(string keyUrl)
         {
-            var list = await ReadKey<string>(new ReadKeyParmeter { DC = null, Key = key.ToString(), Recurse = true, Raw = true, Keys = true, Separator = "/" });
-            var backList = new List<string>();
-            if (list != null)
+            if (keyUrl.EndsWith("/"))
             {
-                backList.AddRange(list);
+                var list = await ReadKey<string>(new ReadKeyParmeter { DC = null, Key = keyUrl, Recurse = true, Raw = true, Keys = true, Separator = "/" });
+
+                var backList = new List<ReadKeyResult>();
+                foreach (var item in list)
+                {
+                    backList.AddRange(await ReadKey(item));
+                }
+                return backList;
             }
-            return backList;
+            else
+            {
+                var arr = await ReadKey<ReadKeyResult>(new ReadKeyParmeter { DC = null, Key = keyUrl });
+                var backList = new List<ReadKeyResult>();
+                backList.AddRange(arr);
+                return backList;
+            }
         }
+
 
         /// <summary>
         /// write config
@@ -75,19 +96,38 @@ namespace ConsulShareConfig
         /// <returns></returns>
         public async Task<bool> Remove(Key key)
         {
-            var result = await DeleteKey(new DeleteKeyParmeter { Key = key.ToString() });
-            return result.result && result.deleteResult;
+            var keyString = key.ToString();
+            var keyStrArr = keyString.Split(new string[] { Key.RegxString }, StringSplitOptions.RemoveEmptyEntries);
+            var backResult = true;
+            if (keyStrArr.Length > 0)
+            {
+                var list = new List<ReadKeyResult>();
+                list.AddRange(await ReadKey(keyStrArr[0]));
+                foreach (var item in list)
+                {
+                    var reg = new Regex($"^{keyString}$");
+                    if (reg.IsMatch(item.Key))
+                    {
+                        var result = await DeleteKey(new DeleteKeyParmeter { Key = item.Key });
+                        backResult= backResult && result.result && result.deleteResult;
+                    }
+                }
+            }
+            return backResult;
         }
+
+
 
         /// <summary>
         /// This endpoint returns the specified key. If no key exists at the given path, a 404 is returned instead of a 200 response.For multi-key reads, please consider using transaction.
-        /// </summary>
-        /// <param name="readKeyParmeter">Read Key Parmeter</param>
+        /// </summary> 
+        /// <typeparam name="T">back value type</typeparam>
+        /// <param name="readKeyParmeter">read key parmeter</param>
         /// <returns></returns>
-        async Task<W[]> ReadKey<W>(ReadKeyParmeter readKeyParmeter)
+        async Task<T[]> ReadKey<T>(ReadKeyParmeter readKeyParmeter)
         {
             var url = $"/kv/{readKeyParmeter.Key}";
-            var parString = GetUrlParmeter<ReadKeyParmeter>(readKeyParmeter);
+            var parString = GetUrlParmeter(readKeyParmeter);
             if (!string.IsNullOrEmpty(parString))
             {
                 url += $"?{parString}";
@@ -98,7 +138,7 @@ namespace ConsulShareConfig
             {
                 try
                 {
-                    var entity = JsonConvert.DeserializeObject<W[]>(json);
+                    var entity = JsonConvert.DeserializeObject<T[]>(json);
                     return entity;
                 }
                 catch (JsonReaderException)
@@ -112,30 +152,33 @@ namespace ConsulShareConfig
             }
         }
 
-       /// <summary>
-       /// get in parmeter with url
-       /// </summary>
-       /// <typeparam name="W"></typeparam>
-       /// <param name="inEntity"></param>
-       /// <returns></returns>
-        string GetUrlParmeter<T>(T inEntity) where T : class, new()
+        /// <summary>
+        /// get in parmeter with url
+        /// </summary>
+        /// <param name="inEntity"></param>
+        /// <returns></returns>
+        string GetUrlParmeter(object inEntity)
         {
             var parmeterString = new StringBuilder();
             foreach (var pro in inEntity.GetType().GetProperties())
             {
                 //get property value
-                var entityValue = pro.GetValue(inEntity);              
-                if (!pro.PropertyType.IsValueType&&entityValue == null)
+                var entityValue = pro.GetValue(inEntity);
+                if (!pro.PropertyType.IsValueType)
                 {
-                    continue;                   
-                }
-                else
-                {
-                    if (entityValue.ToString() == Activator.CreateInstance(pro.PropertyType).ToString())
+                    if (entityValue == null)
                     {
                         continue;
                     }
-                }                       
+                }
+                else
+                {
+                    var defultValue = Activator.CreateInstance(pro.PropertyType);
+                    if (entityValue.ToString() == defultValue.ToString())
+                    {
+                        continue;
+                    }
+                }
                 parmeterString.Append($"{pro.Name}={pro.GetValue(inEntity)}&");
             }
             return parmeterString.ToString().Trim('&');
@@ -149,7 +192,7 @@ namespace ConsulShareConfig
         async Task<(bool result, bool createUpdateResult)> CreateUpdateKey(CreateUpdateKeyParmeter createUpdateKeyParmeter, object value)
         {
             var url = $"/kv/{createUpdateKeyParmeter.Key}";
-            var parString = GetUrlParmeter<CreateUpdateKeyParmeter>(createUpdateKeyParmeter);
+            var parString = GetUrlParmeter(createUpdateKeyParmeter);
             if (!string.IsNullOrEmpty(parString))
             {
                 url += $"?{parString}";
@@ -176,7 +219,7 @@ namespace ConsulShareConfig
         async Task<(bool result, bool deleteResult)> DeleteKey(DeleteKeyParmeter deleteKeyParmeter)
         {
             var url = $"/kv/{deleteKeyParmeter.Key}";
-            var parString = GetUrlParmeter<DeleteKeyParmeter>(deleteKeyParmeter);
+            var parString = GetUrlParmeter(deleteKeyParmeter);
             if (!string.IsNullOrEmpty(parString))
             {
                 url += $"?{parString}";

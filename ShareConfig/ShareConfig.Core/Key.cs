@@ -32,7 +32,10 @@ namespace ShareConfig.Core
 
         public override string ToString()
         {
-            return $"{NameSpace}/{Environment}/{Version}/{Tag}";
+
+            return $"{(string.IsNullOrEmpty(NameSpace) ? RegxString : NameSpace)}/{(string.IsNullOrEmpty(Environment) ? RegxString : Environment)}/{(string.IsNullOrEmpty(Version) ? RegxString : Version)}/{(string.IsNullOrEmpty(Tag) ? RegxString : Tag)}";
         }
+
+        public const string RegxString = "([\\w*.]*)";
     }
 }
