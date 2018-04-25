@@ -41,26 +41,73 @@ namespace ConsulShareConfig
         /// <typeparam name="T">configuration value type</typeparam>
         /// <param name="key">configuration key</param>
         /// <returns></returns>
-        public async Task<List<T>> Read<T>(Key key) where T : class, new()
+        public async Task<Dictionary<Key, T>> Read<T>(Key key) where T : class, new()
         {
             var keyString = key.ToString();
-            var keyStrArr = keyString.Split(new string[] { Key.RegxString }, StringSplitOptions.RemoveEmptyEntries);
-            var backList = new List<T>();
-            if (keyStrArr.Length > 0)
+            var queryKey = HandleQueryKey(keyString);
+            var backList = new Dictionary<Key, T>();
+            var list = new List<ReadKeyResult>();
+            list.AddRange(await ReadKey(queryKey));
+            foreach (var item in list)
             {
-                var list = new List<ReadKeyResult>();
-                list.AddRange(await ReadKey(keyStrArr[0]));
-                foreach (var item in list)
+                var reg = new Regex($"^{keyString}$");
+                if (reg.IsMatch(item.Key))
                 {
-                    var reg = new Regex($"^{keyString}$");
-                    if (reg.IsMatch(item.Key))
+                    var newKey = new Key();
+                    var keyArr = item.Key.Split('/');
+                    if (keyArr.Length < 4)
                     {
-                        backList.Add(JsonConvert.DeserializeObject<T>(item.DecodeValue));
+                        throw new Exception("");
                     }
+                    newKey.NameSpace = keyArr[0];
+                    newKey.Environment = keyArr[1];
+                    newKey.Version = keyArr[2];
+                    newKey.Tag = keyArr[3];
+                    backList.Add(newKey, JsonConvert.DeserializeObject<T>(item.DecodeValue));
                 }
             }
 
             return backList;
+        }
+        /// <summary>
+        /// Handle key string to consul query key
+        /// </summary>
+        /// <param name="keyString"></param>
+        /// <returns></returns>
+        string HandleQueryKey(string keyString)
+        {
+            var keyStrArr = keyString.Replace(Key.RegxString, "").Split('/');
+            var queryKey = "";
+            if (string.IsNullOrEmpty(keyStrArr[0]))
+            {
+                queryKey = "/";
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(keyStrArr[1]))
+                {
+                    queryKey = $"{keyStrArr[0]}/";
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(keyStrArr[2]))
+                    {
+                        queryKey = $"{keyStrArr[0]}/{keyStrArr[1]}/";
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(keyStrArr[3]))
+                        {
+                            queryKey = $"{keyStrArr[0]}/{keyStrArr[1]}/{keyStrArr[2]}/";
+                        }
+                        else
+                        {
+                            queryKey = $"{keyStrArr[0]}/{keyStrArr[1]}/{keyStrArr[2]}/{keyStrArr[3]}";
+                        }
+                    }
+                }
+            }
+            return queryKey;
         }
 
         async Task<List<ReadKeyResult>> ReadKey(string keyUrl)
@@ -118,7 +165,7 @@ namespace ConsulShareConfig
                     if (reg.IsMatch(item.Key))
                     {
                         var result = await DeleteKey(new DeleteKeyParmeter { Key = item.Key });
-                        backResult= backResult && result.result && result.deleteResult;
+                        backResult = backResult && result.result && result.deleteResult;
                     }
                 }
             }

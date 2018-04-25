@@ -6,6 +6,11 @@ namespace ShareConfig.DataPersistence.SqlServer
 {
     public class SqlServerPersistence : Core.IDataPersistence
     {
+        string _connectionString;
+        public SqlServerPersistence(string connectionString)
+        {
+            _connectionString = connectionString;
+        }
         public Dictionary<Key, T> ReadConfigs<T>() where T : class, new()
         {
             throw new NotImplementedException();

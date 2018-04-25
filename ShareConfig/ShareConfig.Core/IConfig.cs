@@ -23,7 +23,7 @@ namespace ShareConfig.Core
         /// <typeparam name="T">configration value type</typeparam>
         /// <param name="key">configration key</param>
         /// <returns></returns>
-        Task<List<T>> Read<T>(Key key) where T : class, new();
+        Task<Dictionary<Key,T>> Read<T>(Key key) where T : class, new();
 
         /// <summary>
         /// remove configuration

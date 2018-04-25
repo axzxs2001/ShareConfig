@@ -57,7 +57,7 @@ namespace ConsoleSample
                                 Console.WriteLine("================query result================");
                                 foreach (var item in keylist)
                                 {
-                                    Console.WriteLine($"{item.Name},{item.Sex}");
+                                    Console.WriteLine($"Key:{item.Key.ToString()},Value:{item.Value.Name},{item.Value.Sex}");
                                 }
                                 Console.WriteLine("====================================");
                                 break;
