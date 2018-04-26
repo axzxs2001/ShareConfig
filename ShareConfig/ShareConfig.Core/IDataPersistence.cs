@@ -9,13 +9,13 @@ namespace ShareConfig.Core
     /// </summary>
     public interface IDataPersistence
     {
-       
+
         /// <summary>
         /// read all config from database
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Dictionary<Key, T> ReadConfigs<T>() where T:class,new();
+        Dictionary<Key, dynamic> ReadConfigs();
     
 
         /// <summary>
@@ -24,6 +24,6 @@ namespace ShareConfig.Core
         /// <typeparam name="T">configruation value type</typeparam>
         /// <param name="configs">all config</param>
         /// <returns></returns>
-        bool WriteConfigs<T>(Dictionary<Key, T> configs) where T : class, new();
+        bool WriteConfigs(Dictionary<Key, dynamic> configs);
     }
 }
