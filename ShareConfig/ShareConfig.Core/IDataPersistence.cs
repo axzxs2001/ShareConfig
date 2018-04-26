@@ -15,7 +15,7 @@ namespace ShareConfig.Core
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        Dictionary<Key, dynamic> ReadConfigs();
+        Dictionary<string, string> ReadConfigs();
     
 
         /// <summary>
