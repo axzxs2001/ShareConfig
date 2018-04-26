@@ -8,4 +8,7 @@
     <ProjectReference Include="..\ShareConfig.Core\ShareConfig.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
+  </ItemGroup>
 </Project>
