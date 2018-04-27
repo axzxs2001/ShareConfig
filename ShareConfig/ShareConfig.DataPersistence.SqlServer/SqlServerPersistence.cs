@@ -73,10 +73,10 @@ CONSTRAINT [PK_Configs] PRIMARY KEY CLUSTERED
 END
 ";
                     cmd.ExecuteNonQuery();
-                    //删除configs全部数据
+                    //delete all config data
                     cmd.CommandText = "DELETE FROM Configs";
                     cmd.ExecuteNonQuery();
-                    //添加全部配置信息
+                    //get datatable organization
                     cmd.CommandText = "SELECT [Key],[Value] FROM Configs";
                     var reader = cmd.ExecuteReader();
                     var table = new DataTable();
@@ -89,15 +89,12 @@ END
                         table.Rows.Add(row);
                     }
 
-
+					//add all config data
                     var sqlbulk = new SqlBulkCopy(con, SqlBulkCopyOptions.UseInternalTransaction, tran);
                     sqlbulk.NotifyAfter = table.Rows.Count;
-                    //目标数据库表名
-                    sqlbulk.DestinationTableName = "Configs";
-                    //数据集字段索引与数据库字段索引映射
+                    sqlbulk.DestinationTableName = "Configs";               
                     sqlbulk.ColumnMappings.Add(0, "Key");
-                    sqlbulk.ColumnMappings.Add(1, "Value");
-                    //导入
+                    sqlbulk.ColumnMappings.Add(1, "Value");                
                     sqlbulk.WriteToServer(table);
                     sqlbulk.Close();
                     tran.Commit();
