@@ -53,11 +53,11 @@ namespace ConsoleSample
                                 var queryTag = Console.ReadLine();
 
                                 var queryKey = new Key { NameSpace = queryNameSpace, Environment = queryEnvironment, Version = queryVersion, Tag = queryTag };
-                                var keylist = await config.Read<MyEntity>(queryKey);
+                                var keylist = await config.Read(queryKey);
                                 Console.WriteLine("================query result================");
                                 foreach (var item in keylist)
                                 {
-                                    Console.WriteLine($"Key:{item.Key.ToString()},Value:{item.Value.Name},{item.Value.Sex}");
+                                    Console.WriteLine($"Key:{item.Key.ToString()},Value:{(item.Value as MyEntity).Name},{(item.Value as MyEntity).Sex}");
                                 }
                                 Console.WriteLine("====================================");
                                 break;

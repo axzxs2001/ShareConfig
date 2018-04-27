@@ -41,11 +41,11 @@ namespace ConsulShareConfig
         /// <typeparam name="T">configuration value type</typeparam>
         /// <param name="key">configuration key</param>
         /// <returns></returns>
-        public async Task<Dictionary<Key, T>> Read<T>(Key key) where T : class, new()
+        public async Task<Dictionary<Key, dynamic>> Read(Key key)
         {
             var keyString = key.ToString();
             var queryKey = HandleQueryKey(keyString);
-            var backList = new Dictionary<Key, T>();
+            var backList = new Dictionary<Key, dynamic>();
             var list = new List<ReadKeyResult>();
             list.AddRange(await ReadKey(queryKey));
             foreach (var item in list)
@@ -63,7 +63,7 @@ namespace ConsulShareConfig
                     newKey.Environment = keyArr[1];
                     newKey.Version = keyArr[2];
                     newKey.Tag = keyArr[3];
-                    backList.Add(newKey, JsonConvert.DeserializeObject<T>(item.DecodeValue));
+                    backList.Add(newKey, JsonConvert.DeserializeObject(item.DecodeValue));
                 }
             }
 
@@ -112,7 +112,8 @@ namespace ConsulShareConfig
 
         async Task<List<ReadKeyResult>> ReadKey(string keyUrl)
         {
-            if (keyUrl.EndsWith("/"))
+            //read  key/value in directory
+            if (keyUrl.EndsWith("/",true, System.Globalization.CultureInfo.CurrentCulture))
             {
                 var list = await ReadKey<string>(new ReadKeyParmeter { DC = null, Key = keyUrl, Recurse = true, Raw = true, Keys = true, Separator = "/" });
 
@@ -123,7 +124,7 @@ namespace ConsulShareConfig
                 }
                 return backList;
             }
-            else
+            else//read key/value
             {
                 var arr = await ReadKey<ReadKeyResult>(new ReadKeyParmeter { DC = null, Key = keyUrl });
                 var backList = new List<ReadKeyResult>();

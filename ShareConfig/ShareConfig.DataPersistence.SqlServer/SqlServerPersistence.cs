@@ -85,7 +85,7 @@ END
                     {
                         var row = table.NewRow();
                         row["key"] = item.Key.ToString();
-                        row["value"] = Newtonsoft.Json.JsonConvert.SerializeObject(item.Value);
+                        row["value"] = Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object);
                         table.Rows.Add(row);
                     }
 
