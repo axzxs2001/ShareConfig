@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Owners>桂素伟</Owners>
+    <Title>ConsulShareConfig</Title>
   </PropertyGroup>
 
   <ItemGroup>
