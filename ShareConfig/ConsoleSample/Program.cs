@@ -8,7 +8,15 @@ namespace ConsoleSample
 {
     internal class Program
     {
-static async Task Main(string[] args)
+        static void Main(string[] args)
+        {
+        }
+
+        static void DataHandle()
+        {
+           
+        }
+        static async Task ConsulHandle()
         {
             try
             {

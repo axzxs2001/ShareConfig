@@ -21,9 +21,7 @@ namespace ShareConfig.DataPersistence.Sqlite
         /// </summary>
         /// <returns></returns>
         public Dictionary<string, string> ReadConfigs()
-        {
-            
-          
+        {          
             using (var con = new SQLiteConnection(_connectionString))
             {
                 var cmd = new SQLiteCommand();
@@ -74,8 +72,7 @@ END
                     cmd.ExecuteNonQuery();
                     //delete all config data
                     cmd.CommandText = "DELETE FROM Configs";
-                    cmd.ExecuteNonQuery();
-                  
+                    cmd.ExecuteNonQuery();                  
 
                     //add all config data
                     foreach(var item in configs)
@@ -83,10 +80,9 @@ END
                         cmd.CommandText = "INSERT INTO Configs(Key,Value) Values(@Key,@Value)";
                         cmd.Parameters.Clear();
                         cmd.Parameters.Add(new SQLiteParameter("@Key", item.Key.ToString()));
-                        cmd.Parameters.Add("@Value",Newtonsoft.Json.JsonConvert.SerializeObject(item.Value));
+                        cmd.Parameters.Add(new SQLiteParameter(parameterName: "@Value",value: Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object)));
                         cmd.ExecuteNonQuery();
-                    }
-                  
+                    }                  
                     tran.Commit();
                     return true;
                 }
