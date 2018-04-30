@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
+using Microsoft.Data.Sqlite;
 using System.Data;
 using ShareConfig.Core;
 
 namespace ShareConfig.DataPersistence.Sqlite
 {
-    public class SqliteDataPersistence
+    public class SqliteDataPersistence: Core.IDataPersistence
     {
         /// <summary>
         /// connection string
@@ -22,9 +22,9 @@ namespace ShareConfig.DataPersistence.Sqlite
         /// <returns></returns>
         public Dictionary<string, string> ReadConfigs()
         {          
-            using (var con = new SQLiteConnection(_connectionString))
+            using (var con = new SqliteConnection(_connectionString))
             {
-                var cmd = new SQLiteCommand();
+                var cmd = new SqliteCommand();
                 cmd.Connection = con;
                 cmd.CommandText = "SELECT [KEY],[VALUE] FROM Configs";
                 con.Open();
@@ -47,13 +47,13 @@ namespace ShareConfig.DataPersistence.Sqlite
         /// <returns></returns>
         public bool WriteConfigs(Dictionary<Key, dynamic> configs)
         {
-            using (var con = new SQLiteConnection(_connectionString))
+            using (var con = new SqliteConnection(_connectionString))
             {
                 con.Open();
                 var tran = con.BeginTransaction();
                 try
                 {
-                    var cmd = new SQLiteCommand();
+                    var cmd = new SqliteCommand();
                     cmd.Connection = con;
                     cmd.Transaction = tran;
                     //创建Configs表
@@ -79,8 +79,8 @@ END
                     {
                         cmd.CommandText = "INSERT INTO Configs(Key,Value) Values(@Key,@Value)";
                         cmd.Parameters.Clear();
-                        cmd.Parameters.Add(new SQLiteParameter("@Key", item.Key.ToString()));
-                        cmd.Parameters.Add(new SQLiteParameter(parameterName: "@Value",value: Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object)));
+                        cmd.Parameters.Add(new SqliteParameter("@Key", item.Key.ToString()));
+                        cmd.Parameters.Add(new SqliteParameter(name: "@Value",value: Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object)));
                         cmd.ExecuteNonQuery();
                     }                  
                     tran.Commit();
