@@ -22,10 +22,15 @@ namespace ShareConfig.DataPersistence.Redis
         public Dictionary<string, string> ReadConfigs()
         {
             var redis = ConnectionMultiplexer.Connect(_connectionString);
-
-            var configDic = new Dictionary<string, string>();
-
-              return configDic;
+            var server= redis.GetServer(_connectionString);
+            var keys= server.Keys();
+            var dataBase = redis.GetDatabase();
+			var configDic = new Dictionary<string, string>();
+            foreach(var key in keys)
+            {
+                configDic.Add(key, dataBase.StringGet(key));    
+            }
+            return configDic;
 
         }
         /// <summary>

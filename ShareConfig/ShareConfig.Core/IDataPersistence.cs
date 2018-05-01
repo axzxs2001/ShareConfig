@@ -13,7 +13,6 @@ namespace ShareConfig.Core
         /// <summary>
         /// read all config from database
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         Dictionary<string, string> ReadConfigs();
     
