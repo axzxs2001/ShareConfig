@@ -21,16 +21,18 @@ namespace ShareConfig.DataPersistence.Redis
         /// <returns></returns>
         public Dictionary<string, string> ReadConfigs()
         {
-            var redis = ConnectionMultiplexer.Connect(_connectionString);
-            var server= redis.GetServer(_connectionString);
-            var keys= server.Keys();
-            var dataBase = redis.GetDatabase();
-			var configDic = new Dictionary<string, string>();
-            foreach(var key in keys)
+            using (var redis = ConnectionMultiplexer.Connect(_connectionString))
             {
-                configDic.Add(key, dataBase.StringGet(key));    
+                var server = redis.GetServer(_connectionString);
+                var keys = server.Keys();
+                var dataBase = redis.GetDatabase();
+                var configDic = new Dictionary<string, string>();
+                foreach (var key in keys)
+                {
+                    configDic.Add(key, dataBase.StringGet(key));
+                }
+                return configDic;
             }
-            return configDic;
 
         }
         /// <summary>
@@ -40,15 +42,17 @@ namespace ShareConfig.DataPersistence.Redis
         /// <returns></returns>
         public bool WriteConfigs(Dictionary<Key, dynamic> configs)
         {
-            var redis = ConnectionMultiplexer.Connect(_connectionString);
-            var dataBase = redis.GetDatabase();
-
-            var list =new  List< KeyValuePair<RedisKey, RedisValue>>();
-            foreach(var item in configs)
+            using (var redis = ConnectionMultiplexer.Connect(_connectionString))
             {
-                dataBase.StringSet(item.Key.ToString(),Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object));
+                var dataBase = redis.GetDatabase();
+
+                var list = new List<KeyValuePair<RedisKey, RedisValue>>();
+                foreach (var item in configs)
+                {
+                    dataBase.StringSet(item.Key.ToString(), Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object));
+                }
+                return true;
             }
-            return true;
         }
     }
 }
