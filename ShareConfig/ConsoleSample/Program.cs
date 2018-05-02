@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using ShareConfig.Core;
 using ConsulShareConfig;
+using System.Collections.Generic;
 
 namespace ConsoleSample
 {
@@ -10,12 +11,22 @@ namespace ConsoleSample
     {
         static void Main(string[] args)
         {
+            DataHandle();
         }
 
         static void DataHandle()
         {
-           
+            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:6379");
+
+            var key = new Key { NameSpace = "ns", Environment = "pro", Version = "1.0", Tag = "His" };
+            var value = new { Name = "桂素伟", Age = 18, Sex = false };
+            var dic = new Dictionary<Key, dynamic>();
+            dic.Add(key, value);
+            var result = dataPersistence.WriteConfigs(dic);
+            Console.WriteLine(result);
         }
+
+
         static async Task ConsulHandle()
         {
             try

@@ -13,6 +13,9 @@
   <ItemGroup>
     <ProjectReference Include="..\ConsulShareConfig\ConsulShareConfig.csproj" />
     <ProjectReference Include="..\ShareConfig.Core\ShareConfig.Core.csproj" />
+    <ProjectReference Include="..\ShareConfig.DataPersistence.Redis\ShareConfig.DataPersistence.Redis.csproj" />
+    <ProjectReference Include="..\ShareConfig.DataPersistence.Sqlite\ShareConfig.DataPersistence.Sqlite.csproj" />
+    <ProjectReference Include="..\ShareConfig.DataPersistence.SqlServer\ShareConfig.DataPersistence.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>
