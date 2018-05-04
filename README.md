@@ -1,0 +1,2 @@
+# ShareConfig
+Distributed configuration
