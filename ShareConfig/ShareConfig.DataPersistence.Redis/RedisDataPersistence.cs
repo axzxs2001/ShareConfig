@@ -42,7 +42,6 @@ namespace ShareConfig.DataPersistence.Redis
         /// <returns></returns>
         public bool WriteConfigs(Dictionary<Key, dynamic> configs)
         {
-
             using (var redis = ConnectionMultiplexer.Connect(_connectionString))
             {
                 var dataBase = redis.GetDatabase();

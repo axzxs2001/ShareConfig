@@ -16,7 +16,39 @@ namespace ConsoleSample
 
         static void DataHandle()
         {
-            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("endpoint,password=__@picker-redis,ConnectTimeout=10000");
+            /*
+            首先在Docker中安装redis，然后用docker run -p 56379:6379 redis 运行docekr中的redis
+            */
+            while (true)
+            {
+                Console.WriteLine("1、写入Redis  2、读取Redis  3、退出");
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        Write();
+                        break;
+                    case "2":
+                        Read();
+                        break;
+                    case "3":
+                        return;
+                }
+            }
+        }
+        static void Read()
+        {
+            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
+            var result = dataPersistence.ReadConfigs();
+            foreach(var item in result)
+            {
+                Console.WriteLine($"Key:{item.Key}");
+                Console.WriteLine($"Value:{item.Value}");
+            }
+            
+        }
+        static void Write()
+        {
+            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
 
             var key = new Key { NameSpace = "ns", Environment = "pro", Version = "1.0", Tag = "His" };
             var value = new { Name = "桂素伟", Age = 18, Sex = false };
