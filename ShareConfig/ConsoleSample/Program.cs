@@ -16,7 +16,7 @@ namespace ConsoleSample
 
         static void DataHandle()
         {
-            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("endpoint,password=password,ConnectTimeout=10000");
+            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("endpoint,password=__@picker-redis,ConnectTimeout=10000");
 
             var key = new Key { NameSpace = "ns", Environment = "pro", Version = "1.0", Tag = "His" };
             var value = new { Name = "桂素伟", Age = 18, Sex = false };
