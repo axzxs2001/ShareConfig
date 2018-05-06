@@ -13,15 +13,17 @@ namespace ConsoleSample
         {
             DataHandle();
         }
-
+        /// <summary>
+        /// Datas the handle.
+        /// </summary>
         static void DataHandle()
         {
             /*
-            首先在Docker中安装redis，然后用docker run -p 56379:6379 redis 运行docekr中的redis
+            first install redis in docker，exec command "docker run -p 56379:6379 redis "
             */
             while (true)
             {
-                Console.WriteLine("1、写入Redis  2、读取Redis  3、退出");
+                Console.WriteLine("1、Write Redis  2、Read Redis  3、Exit");
                 switch (Console.ReadLine())
                 {
                     case "1":
@@ -35,6 +37,9 @@ namespace ConsoleSample
                 }
             }
         }
+        /// <summary>
+        /// Read Redis
+        /// </summary>
         static void Read()
         {
             var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
@@ -46,19 +51,25 @@ namespace ConsoleSample
             }
             
         }
+        /// <summary>
+        /// write redis
+        /// </summary>
         static void Write()
         {
             var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
 
             var key = new Key { NameSpace = "ns", Environment = "pro", Version = "1.0", Tag = "His" };
-            var value = new { Name = "桂素伟", Age = 18, Sex = false };
+            var value = new { Name = "Gui Suwei", Age = 18, Sex = false };
             var dic = new Dictionary<Key, dynamic>();
             dic.Add(key, value);
             var result = dataPersistence.WriteConfigs(dic);
             Console.WriteLine(result);
         }
 
-
+        /// <summary>
+        /// Consuls the handle.
+        /// </summary>
+        /// <returns>The handle.</returns>
         static async Task ConsulHandle()
         {
             try
@@ -144,7 +155,9 @@ namespace ConsoleSample
             }
         }
     }
-
+    /// <summary>
+    /// Config Entity
+    /// </summary>
     class MyEntity
     {
         public string Name { get; set; }
