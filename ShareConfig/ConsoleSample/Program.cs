@@ -11,7 +11,30 @@ namespace ConsoleSample
     {
         static void Main(string[] args)
         {
-            DataHandle();
+            while(true)
+            {
+                Console.WriteLine("1、Data Handle 2、Consul Handle 3、Mixed Handle 4、Exit");
+                switch(Console.ReadLine())
+                {
+                    case "1":
+                        DataHandle();
+                        break;
+                    case "2":
+                        ConsulHandle().GetAwaiter().GetResult();
+                        break;
+                    case "3":
+                        MixedHandle();
+                        break;
+                    case  "4":
+                        return;
+                }
+            }
+     
+        }
+
+        static void MixedHandle()
+        {
+            
         }
         /// <summary>
         /// Datas the handle.
@@ -84,61 +107,14 @@ namespace ConsoleSample
                         switch (Console.ReadLine())
                         {
                             case "1":
-                                Console.WriteLine("Input NameSpace");
-                                var addNameSpace = Console.ReadLine();
-
-                                Console.WriteLine("Input Environment");
-                                var addEnvironment = Console.ReadLine();
-
-                                Console.WriteLine("Input Version");
-                                var addVersion = Console.ReadLine();
-
-                                Console.WriteLine("Input Tag");
-                                var addTag = Console.ReadLine();
-
-                                var key = new Key { NameSpace = addNameSpace, Environment = addEnvironment, Version = addVersion, Tag = addTag };
-                                var addResult = await config.Write(key, new MyEntity { Name = "ggg_" + key.ToString(), Sex = true });
-                                Console.WriteLine($"add result:{addResult}");
+                                await AddConfig(config);
                                 break;
 
                             case "2":
-                                Console.WriteLine("Input NameSpace");
-                                var queryNameSpace = Console.ReadLine();
-
-                                Console.WriteLine("Input Environment");
-                                var queryEnvironment = Console.ReadLine();
-
-                                Console.WriteLine("Input Version");
-                                var queryVersion = Console.ReadLine();
-
-                                Console.WriteLine("Input Tag");
-                                var queryTag = Console.ReadLine();
-
-                                var queryKey = new Key { NameSpace = queryNameSpace, Environment = queryEnvironment, Version = queryVersion, Tag = queryTag };
-                                var keylist = await config.Read(queryKey);
-                                Console.WriteLine("================query result================");
-                                foreach (var item in keylist)
-                                {
-                                    Console.WriteLine($"Key:{item.Key.ToString()},Value:{(item.Value as MyEntity).Name},{(item.Value as MyEntity).Sex}");
-                                }
-                                Console.WriteLine("====================================");
+                                await QueryConfig(config);
                                 break;
                             case "3":
-                                Console.WriteLine("Input NameSpace");
-                                var deleteNameSpace = Console.ReadLine();
-
-                                Console.WriteLine("Input Environment");
-                                var deleteEnvironment = Console.ReadLine();
-
-                                Console.WriteLine("Input Version");
-                                var deleteVersion = Console.ReadLine();
-
-                                Console.WriteLine("Input Tag");
-                                var deleteTag = Console.ReadLine();
-
-                                var deleteKey = new Key { NameSpace = deleteNameSpace, Environment = deleteEnvironment, Version = deleteVersion, Tag = deleteTag };
-                                var removeResult = await config.Remove(deleteKey);
-                                Console.WriteLine($"remove result:{removeResult}");
+                                await RemoveConfig(config);
                                 break;
                         }
                     }
@@ -153,6 +129,80 @@ namespace ConsoleSample
                 Console.WriteLine(exc.Message);
                 return;
             }
+        }
+        /// <summary>
+        /// Removes the config.
+        /// </summary>
+        /// <returns>The config.</returns>
+        /// <param name="config">Config.</param>
+        private static async Task RemoveConfig(IConfig config)
+        {
+            Console.WriteLine("Input NameSpace");
+            var deleteNameSpace = Console.ReadLine();
+
+            Console.WriteLine("Input Environment");
+            var deleteEnvironment = Console.ReadLine();
+
+            Console.WriteLine("Input Version");
+            var deleteVersion = Console.ReadLine();
+
+            Console.WriteLine("Input Tag");
+            var deleteTag = Console.ReadLine();
+
+            var deleteKey = new Key { NameSpace = deleteNameSpace, Environment = deleteEnvironment, Version = deleteVersion, Tag = deleteTag };
+            var removeResult = await config.Remove(deleteKey);
+            Console.WriteLine($"remove result:{removeResult}");
+        }
+        /// <summary>
+        /// Queries the config.
+        /// </summary>
+        /// <returns>The config.</returns>
+        /// <param name="config">Config.</param>
+        private static async Task QueryConfig(IConfig config)
+        {
+            Console.WriteLine("Input NameSpace");
+            var queryNameSpace = Console.ReadLine();
+
+            Console.WriteLine("Input Environment");
+            var queryEnvironment = Console.ReadLine();
+
+            Console.WriteLine("Input Version");
+            var queryVersion = Console.ReadLine();
+
+            Console.WriteLine("Input Tag");
+            var queryTag = Console.ReadLine();
+
+            var queryKey = new Key { NameSpace = queryNameSpace, Environment = queryEnvironment, Version = queryVersion, Tag = queryTag };
+            var keylist = await config.Read(queryKey);
+            Console.WriteLine("================query result================");
+            foreach (var item in keylist)
+            {
+                Console.WriteLine($"Key:{item.Key.ToString()},Value:{(item.Value as MyEntity).Name},{(item.Value as MyEntity).Sex}");
+            }
+            Console.WriteLine("====================================");
+        }
+        /// <summary>
+        /// Adds the config.
+        /// </summary>
+        /// <returns>The config.</returns>
+        /// <param name="config">Config.</param>
+        private static async Task AddConfig(IConfig config)
+        {
+            Console.WriteLine("Input NameSpace");
+            var addNameSpace = Console.ReadLine();
+
+            Console.WriteLine("Input Environment");
+            var addEnvironment = Console.ReadLine();
+
+            Console.WriteLine("Input Version");
+            var addVersion = Console.ReadLine();
+
+            Console.WriteLine("Input Tag");
+            var addTag = Console.ReadLine();
+
+            var key = new Key { NameSpace = addNameSpace, Environment = addEnvironment, Version = addVersion, Tag = addTag };
+            var addResult = await config.Write(key, new MyEntity { Name = "ggg_" + key.ToString(), Sex = true });
+            Console.WriteLine($"add result:{addResult}");
         }
     }
     /// <summary>
