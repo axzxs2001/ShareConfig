@@ -94,5 +94,30 @@ END
 
             }
         }
+        /// <summary>
+        /// Deletes the config.
+        /// </summary>
+        /// <returns><c>true</c>, if config was deleted, <c>false</c> otherwise.</returns>
+        /// <param name="keys">Keys.</param>
+        public bool DeleteConfig(params string[] keys)
+        {
+            var parmeterNames = new List<string>();
+            var parmeterValues = new List<SqliteParameter>();
+            for (int i = 0; i < keys.Length; i++)
+            {
+                parmeterNames.Add($"@p{i}");
+                parmeterValues.Add(new SqliteParameter { Value = keys[i], ParameterName = $"@p{i}" });
+            }
+            using (var con = new SqliteConnection(_connectionString))
+            {
+                var cmd = new SqliteCommand();
+                cmd.Connection = con;
+                cmd.CommandText = $"delete FROM Configs where key in({string.Join(",", parmeterNames.ToArray())})";
+                cmd.Parameters.AddRange(parmeterValues.ToArray());
+                con.Open();
+                var reader = cmd.ExecuteNonQuery();
+                return true;
+            }
+        }
     }
 }

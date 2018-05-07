@@ -24,5 +24,11 @@ namespace ShareConfig.Core
         /// <param name="configs">all config</param>
         /// <returns></returns>
         bool WriteConfigs(Dictionary<Key, dynamic> configs);
+        /// <summary>
+        /// Deletes the configs.
+        /// </summary>
+        /// <returns><c>true</c>, if configs was deleted, <c>false</c> otherwise.</returns>
+        /// <param name="keys">Keys.</param>
+        bool DeleteConfig(params string[] keys);
     }
 }

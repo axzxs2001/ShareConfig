@@ -54,5 +54,24 @@ namespace ShareConfig.DataPersistence.Redis
                 return true;
             }
         }
+        /// <summary>
+        /// Deletes the config.
+        /// </summary>
+        /// <returns><c>true</c>, if config was deleted, <c>false</c> otherwise.</returns>
+        /// <param name="keys">Keys.</param>
+        public bool DeleteConfig(params string[] keys)
+        {
+            using (var redis = ConnectionMultiplexer.Connect(_connectionString))
+            {
+                var dataBase = redis.GetDatabase();
+
+                var list = new List<KeyValuePair<RedisKey, RedisValue>>();
+                foreach (var item in keys)
+                {
+                     dataBase.KeyDelete(item);
+                }
+                return true;
+            }
+        }
     }
 }

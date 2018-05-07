@@ -11,10 +11,11 @@ namespace ConsoleSample
     {
         static void Main(string[] args)
         {
-            while(true)
+
+            while (true)
             {
                 Console.WriteLine("1、Data Handle 2、Consul Handle 3、Mixed Handle 4、Exit");
-                switch(Console.ReadLine())
+                switch (Console.ReadLine())
                 {
                     case "1":
                         DataHandle();
@@ -25,17 +26,30 @@ namespace ConsoleSample
                     case "3":
                         MixedHandle();
                         break;
-                    case  "4":
+                    case "4":
                         return;
                 }
             }
-     
+
         }
 
         static void MixedHandle()
         {
-            
+            while (true)
+            {
+                Console.WriteLine("1、Read Config  2、Remove Config 3、Exit");
+                switch (Console.ReadLine())
+                {
+                    case "1":
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        return;
+                }
+            }
         }
+        #region Redis
         /// <summary>
         /// Datas the handle.
         /// </summary>
@@ -46,16 +60,19 @@ namespace ConsoleSample
             */
             while (true)
             {
-                Console.WriteLine("1、Write Redis  2、Read Redis  3、Exit");
+                Console.WriteLine("1、Write Redis  2、Read Redis 3、Delete Redis 4、Exit");
                 switch (Console.ReadLine())
                 {
                     case "1":
-                        Write();
+                        WriteRedis();
                         break;
                     case "2":
-                        Read();
+                        ReadRedis();
                         break;
                     case "3":
+                        DeleteRedis();
+                        break;
+                    case "4":
                         return;
                 }
             }
@@ -63,21 +80,21 @@ namespace ConsoleSample
         /// <summary>
         /// Read Redis
         /// </summary>
-        static void Read()
+        static void ReadRedis()
         {
             var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
             var result = dataPersistence.ReadConfigs();
-            foreach(var item in result)
+            foreach (var item in result)
             {
                 Console.WriteLine($"Key:{item.Key}");
                 Console.WriteLine($"Value:{item.Value}");
             }
-            
+
         }
         /// <summary>
         /// write redis
         /// </summary>
-        static void Write()
+        static void WriteRedis()
         {
             var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
 
@@ -89,6 +106,19 @@ namespace ConsoleSample
             Console.WriteLine(result);
         }
 
+        static void DeleteRedis()
+        {
+            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
+
+            var key = new Key { NameSpace = "ns", Environment = "pro", Version = "1.0", Tag = "His" };
+            var value = new { Name = "Gui Suwei", Age = 18, Sex = false };
+            var dic = new Dictionary<Key, dynamic>();
+            dic.Add(key, value);
+            var result = dataPersistence.WriteConfigs(dic);
+            Console.WriteLine(result);
+        }
+#endregion
+        #region Consul
         /// <summary>
         /// Consuls the handle.
         /// </summary>
@@ -205,6 +235,7 @@ namespace ConsoleSample
             Console.WriteLine($"add result:{addResult}");
         }
     }
+    #endregion
     /// <summary>
     /// Config Entity
     /// </summary>
