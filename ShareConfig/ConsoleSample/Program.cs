@@ -32,28 +32,46 @@ namespace ConsoleSample
             }
 
         }
-
-        static void MixedHandle()
+#region Mixed 
+		static void MixedHandle()
         {
             while (true)
             {
-                Console.WriteLine("1、Read Config  2、Remove Config 3、Exit");
+				Console.WriteLine("1、Load Config from data  2、Synchronize Config  3、Remove Config 4、Exit");
                 switch (Console.ReadLine())
                 {
                     case "1":
+						LoadConfig();
                         break;
                     case "2":
+						SynchronizeConfg();
                         break;
                     case "3":
+						RemoveConfig();
                         return;
+					case "4":
+						return;
                 }
             }
         }
-        #region Redis
-        /// <summary>
-        /// Datas the handle.
-        /// </summary>
-        static void DataHandle()
+        static void LoadConfig()
+		{
+			
+		}
+		static void SynchronizeConfg()
+		{
+			
+		}
+        static void RemoveConfig()
+		{
+			
+		}
+#endregion
+		#region Redis
+		/// <summary>
+		/// Datas the handle.
+		/// </summary>
+		static void DataHandle()
         {
             /*
             first install redis in docker，exec command "docker run -p 56379:6379 redis "
@@ -105,16 +123,15 @@ namespace ConsoleSample
             var result = dataPersistence.WriteConfigs(dic);
             Console.WriteLine(result);
         }
-
+        /// <summary>
+        /// deletes redis.
+        /// </summary>
         static void DeleteRedis()
         {
             var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
 
             var key = new Key { NameSpace = "ns", Environment = "pro", Version = "1.0", Tag = "His" };
-            var value = new { Name = "Gui Suwei", Age = 18, Sex = false };
-            var dic = new Dictionary<Key, dynamic>();
-            dic.Add(key, value);
-            var result = dataPersistence.WriteConfigs(dic);
+			var result = dataPersistence.DeleteConfig(key.ToString());
             Console.WriteLine(result);
         }
 #endregion
