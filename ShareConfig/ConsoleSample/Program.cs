@@ -36,14 +36,14 @@ namespace ConsoleSample
 		static void MixedHandle()
 		{
 			var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>();
-            var config = ConfigFactory.CreateConfig<ConsulConfig>();
+			var config = ConfigFactory.CreateConfig<ConsulConfig>();
 			while (true)
 			{
 				Console.WriteLine("1、Load Config from data  2、Synchronize Config  3、Remove Config 4、Exit");
 				switch (Console.ReadLine())
 				{
 					case "1":
-						LoadConfig(dataPersistence,config);
+						LoadConfig(dataPersistence,config).GetAwaiter().GetResult();
 						break;
 					case "2":
 						SynchronizeConfg();
@@ -56,28 +56,33 @@ namespace ConsoleSample
 				}
 			}
 		}
-        /// <summary>
-        /// Loads the config.
-        /// </summary>
-		static void LoadConfig(IDataPersistence dataPersistence,IConfig config)
+		/// <summary>
+		/// Loads the config.
+		/// </summary>
+		static async Task<bool> LoadConfig(IDataPersistence dataPersistence,IConfig config)
 		{
 			var configs = dataPersistence.ReadConfigs();
 
 			foreach(var item in configs)
 			{
-				//config.Write<MyEntity>(item.Key, item.Value);                
-            }
+				var result=await config.Write(Newtonsoft.Json.JsonConvert.DeserializeObject<Key>( item.Key),Newtonsoft.Json.JsonConvert.DeserializeObject<MyEntity>( item.Value)); 
+				if(!result)
+				{
+					throw new Exception("write consul config fault");
+				}
+			}
+            return true;
 		}
-        /// <summary>
-        /// Synchronizes the confg.
-        /// </summary>
+		/// <summary>
+		/// Synchronizes the confg.
+		/// </summary>
 		static void SynchronizeConfg()
 		{
 
 		}
-        /// <summary>
-        /// Removes the config.
-        /// </summary>
+		/// <summary>
+		/// Removes the config.
+		/// </summary>
 		static void RemoveConfig()
 		{
 
@@ -90,8 +95,8 @@ namespace ConsoleSample
 		static void DataHandle()
 		{
 			/*
-            first install redis in docker，exec command "docker run -p 56379:6379 redis "
-            */
+			first install redis in docker，exec command "docker run -p 56379:6379 redis "
+			*/
 			while (true)
 			{
 				Console.WriteLine("1、Write Redis  2、Read Redis 3、Delete Redis 4、Exit");
