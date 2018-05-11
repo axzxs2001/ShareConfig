@@ -3,19 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareConfig.Core", "ShareConfig.Core\ShareConfig.Core.csproj", "{EDE2075F-75F4-4C4A-8325-ECD3DD97578C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareConfig.Core", "ShareConfig.Core\ShareConfig.Core.csproj", "{EDE2075F-75F4-4C4A-8325-ECD3DD97578C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsulShareConfig", "ConsulShareConfig\ConsulShareConfig.csproj", "{FCBDC0CF-35FC-483D-BFD2-927DA1AEE56A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsulShareConfig", "ConsulShareConfig\ConsulShareConfig.csproj", "{FCBDC0CF-35FC-483D-BFD2-927DA1AEE56A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleSample", "ConsoleSample\ConsoleSample.csproj", "{88DB26CF-25DE-41B9-9353-0F70A4A642BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSample", "ConsoleSample\ConsoleSample.csproj", "{88DB26CF-25DE-41B9-9353-0F70A4A642BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareConfig.DataPersistence.SqlServer", "ShareConfig.DataPersistence.SqlServer\ShareConfig.DataPersistence.SqlServer.csproj", "{1F0C0AFB-C3D3-4D8D-9B8F-FBC0D40357CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareConfig.DataPersistence.SqlServer", "ShareConfig.DataPersistence.SqlServer\ShareConfig.DataPersistence.SqlServer.csproj", "{1F0C0AFB-C3D3-4D8D-9B8F-FBC0D40357CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareConfig.DataPersistence.Sqlite", "ShareConfig.DataPersistence.Sqlite\ShareConfig.DataPersistence.Sqlite.csproj", "{8DE98F22-BCFF-49FE-A8B8-E5E05B03295F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareConfig.DataPersistence.Sqlite", "ShareConfig.DataPersistence.Sqlite\ShareConfig.DataPersistence.Sqlite.csproj", "{8DE98F22-BCFF-49FE-A8B8-E5E05B03295F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareConfig.DataPersistence.Redis", "ShareConfig.DataPersistence.Redis\ShareConfig.DataPersistence.Redis.csproj", "{2089D451-BE85-4980-B623-70131D09A56A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareConfig.DataPersistence.Redis", "ShareConfig.DataPersistence.Redis\ShareConfig.DataPersistence.Redis.csproj", "{2089D451-BE85-4980-B623-70131D09A56A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareConfig.UI", "ShareConfig.UI\ShareConfig.UI.csproj", "{A18CA029-F4C9-4DEA-84C4-6D25026C43F1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShareConfig.UI", "ShareConfig.UI\ShareConfig.UI.csproj", "{A18CA029-F4C9-4DEA-84C4-6D25026C43F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

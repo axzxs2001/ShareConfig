@@ -11,9 +11,12 @@ namespace ConsoleSample
     {
         static void Main(string[] args)
         {
-
             while (true)
             {
+                Console.Clear();
+                Console.WriteLine("******************************************************");
+                Console.WriteLine("               Config Center");
+                Console.WriteLine("******************************************************");
                 Console.WriteLine("1、Data Handle 2、Consul Handle 3、Mixed Handle 4、Exit");
                 switch (Console.ReadLine())
                 {
@@ -29,13 +32,14 @@ namespace ConsoleSample
                     case "4":
                         return;
                 }
+                System.Threading.Thread.Sleep(2000);
             }
 
         }
         #region Mixed 
         static void MixedHandle()
         {
-            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost: 56379");
+            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost:56379");
             var config = ConfigFactory.CreateConfig<ConsulConfig>();
             while (true)
             {
