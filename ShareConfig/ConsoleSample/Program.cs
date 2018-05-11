@@ -35,7 +35,7 @@ namespace ConsoleSample
         #region Mixed 
         static void MixedHandle()
         {
-            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>();
+            var dataPersistence = DataPersistenceFactory.CreateDataPersistence<ShareConfig.DataPersistence.Redis.RedisDataPersistence>("localhost: 56379");
             var config = ConfigFactory.CreateConfig<ConsulConfig>();
             while (true)
             {
