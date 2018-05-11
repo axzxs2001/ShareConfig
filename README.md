@@ -5,6 +5,6 @@ Distributed configuration
 Consul
 
 ## IDataPersistence
-SqlServer
-Sqlite
-Redis
+1. SqlServer
+2. Sqlite
+3. Redis
