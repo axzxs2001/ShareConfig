@@ -17,12 +17,13 @@ namespace ConsulShareConfig
     {
         string _urlPrefix = "v1";
         HttpClient _client;
-
+        IDataPersistence _dataPersistence;
         /// <summary>
         /// ctor
         /// </summary>
-        public ConsulConfig()
+        public ConsulConfig(IDataPersistence dataPersistence=null)
         {
+            _dataPersistence = dataPersistence;
             _client = new HttpClient();
             _client.BaseAddress = new Uri($"http://localhost:8500");
         }
@@ -30,8 +31,9 @@ namespace ConsulShareConfig
         /// ctor
         /// </summary>
         /// <param name="baseAddress">Base Address，Default value is "http://localhost:8500"</param>
-        public ConsulConfig(string baseAddress = "http://localhost:8500")
+        public ConsulConfig(string baseAddress = "http://localhost:8500", IDataPersistence dataPersistence = null)
         {
+            _dataPersistence = dataPersistence;
             _client = new HttpClient();
             _client.BaseAddress = new Uri($"{baseAddress}");
         }
