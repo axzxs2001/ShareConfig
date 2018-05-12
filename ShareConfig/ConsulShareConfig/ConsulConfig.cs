@@ -21,7 +21,7 @@ namespace ConsulShareConfig
         /// <summary>
         /// ctor
         /// </summary>
-        public ConsulConfig(IDataPersistence dataPersistence=null)
+        public ConsulConfig(IDataPersistence dataPersistence = null)
         {
             _dataPersistence = dataPersistence;
             _client = new HttpClient();
@@ -38,14 +38,45 @@ namespace ConsulShareConfig
             _client.BaseAddress = new Uri($"{baseAddress}");
         }
         /// <summary>
+        /// Ininitializenit configs from data persistence
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> Iinitializenit()
+        {
+            var dataConfigs = _dataPersistence?.ReadConfigs();
+            if (dataConfigs == null)
+            {
+                return false;
+            }
+            else
+            {
+                //read consul configs
+                var consulConfigs = await Read();
+                //consul configs is null
+                if (consulConfigs.Count == 0)
+                {
+                    foreach (var config in dataConfigs)
+                    {
+                        var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = config.Key, DC = null }, config.Value);
+                        if (result.result == false || result.createUpdateResult == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Read Config
         /// </summary>
         /// <typeparam name="T">configuration value type</typeparam>
         /// <param name="key">configuration key</param>
         /// <returns></returns>
-        public async Task<Dictionary<Key, dynamic>> Read(Key key)
+        public async Task<Dictionary<Key, dynamic>> Read(Key key = null)
         {
-            var keyString = key.ToString();
+            var keyString = key == null ? new Key().ToString() : key.ToString();
             var queryKey = HandleQueryKey(keyString);
             var backList = new Dictionary<Key, dynamic>();
             var list = new List<ReadKeyResult>();
@@ -115,7 +146,7 @@ namespace ConsulShareConfig
         async Task<List<ReadKeyResult>> ReadKey(string keyUrl)
         {
             //read  key/value in directory
-            if (keyUrl.EndsWith("/",true, System.Globalization.CultureInfo.CurrentCulture))
+            if (keyUrl.EndsWith("/", true, System.Globalization.CultureInfo.CurrentCulture))
             {
                 var list = await ReadKey<string>(new ReadKeyParmeter { DC = null, Key = keyUrl, Recurse = true, Raw = true, Keys = true, Separator = "/" });
 
@@ -145,6 +176,14 @@ namespace ConsulShareConfig
         /// <returns></returns>
         public async Task<bool> Write<T>(Key key, T value) where T : class, new()
         {
+            //data persistence write all
+            if (_dataPersistence != null)
+            {
+                var configs = await Read();
+                configs.Add(key, value);
+                _dataPersistence.WriteConfigs(configs);
+            }
+            //consul write one
             var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = key.ToString(), DC = null }, value);
             return result.result && result.createUpdateResult;
         }
@@ -154,7 +193,13 @@ namespace ConsulShareConfig
         /// <param name="key">configuration key</param>
         /// <returns></returns>
         public async Task<bool> Remove(Key key)
-        {
+        {   
+            //data persistence delete key
+            if (_dataPersistence != null)
+            {
+                _dataPersistence.DeleteConfig(key.ToString());
+            }
+            //consul remove
             var keyString = key.ToString();
             var keyStrArr = keyString.Split(new string[] { Key.RegxString }, StringSplitOptions.RemoveEmptyEntries);
             var backResult = true;
