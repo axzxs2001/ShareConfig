@@ -21,6 +21,14 @@ namespace ConsulShareConfig
         /// <summary>
         /// ctor
         /// </summary>
+        public ConsulConfig()
+        {
+            _client = new HttpClient();
+            _client.BaseAddress = new Uri($"http://localhost:8500");
+        }
+        /// <summary>
+        /// ctor
+        /// </summary>
         public ConsulConfig(IDataPersistence dataPersistence = null)
         {
             _dataPersistence = dataPersistence;
@@ -153,7 +161,8 @@ namespace ConsulShareConfig
                 var backList = new List<ReadKeyResult>();
                 foreach (var item in list)
                 {
-                    backList.AddRange(await ReadKey(item));
+                    var value =await  ReadKey(item);
+                    backList.AddRange(value);
                 }
                 return backList;
             }
@@ -234,9 +243,9 @@ namespace ConsulShareConfig
             var parString = GetUrlParmeter(readKeyParmeter);
             if (!string.IsNullOrEmpty(parString))
             {
-                url += $"?{parString}";
+                url += $"?{parString.ToLower()}";
             }
-            var response = await _client.GetAsync($"/{_urlPrefix}/{url.ToLower()}");
+            var response = await _client.GetAsync($"/{_urlPrefix}/{url}");
             var json = await response.Content.ReadAsStringAsync();
             if (!string.IsNullOrEmpty(json))
             {

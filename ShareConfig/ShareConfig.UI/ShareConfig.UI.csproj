@@ -12,4 +12,10 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ConsulShareConfig\ConsulShareConfig.csproj" />
+    <ProjectReference Include="..\ShareConfig.Core\ShareConfig.Core.csproj" />
+    <ProjectReference Include="..\ShareConfig.DataPersistence.Redis\ShareConfig.DataPersistence.Redis.csproj" />
+  </ItemGroup>
+
 </Project>
