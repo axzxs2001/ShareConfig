@@ -179,6 +179,18 @@ namespace ConsulShareConfig
             var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = key.ToString(), DC = null }, value);
             return result.result && result.createUpdateResult;
         }
+
+
+        /// <summary>
+        /// write all configuration
+        /// </summary>
+        /// <param name="configs">configs</param>
+        /// <returns></returns>
+        public async Task<bool> WriteAll(Dictionary<string,dynamic> configs)
+        {
+            //TODO no coding
+            return false;
+        }
         #endregion
         #region 私有成员
         /// <summary>
