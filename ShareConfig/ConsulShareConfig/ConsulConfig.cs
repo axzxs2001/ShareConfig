@@ -48,6 +48,13 @@ namespace ConsulShareConfig
             _client.BaseAddress = new Uri($"{baseAddress}");
         }
         #endregion
+
+        //TODO 同步配置与数据实现
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
         #region Key类型 
         /// <summary>
         /// Read Config
@@ -412,7 +419,9 @@ namespace ConsulShareConfig
             var backEntity = JsonConvert.DeserializeObject<bool>(backResult.backJson);
             return (backResult.result, backEntity);
         }
+
         #endregion
+     
 
     }
 }

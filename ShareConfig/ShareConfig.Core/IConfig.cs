@@ -7,7 +7,7 @@ namespace ShareConfig.Core
     /// <summary>
     /// configration interface
     /// </summary>
-    public interface IConfig
+    public interface IConfig:IDisposable
     {
         /// <summary>
         /// Write a single configuration item.
