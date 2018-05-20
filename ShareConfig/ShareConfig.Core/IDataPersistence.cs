@@ -23,7 +23,8 @@ namespace ShareConfig.Core
         /// <typeparam name="T">configruation value type</typeparam>
         /// <param name="configs">all config</param>
         /// <returns></returns>
-        bool WriteConfigs(Dictionary<Key, dynamic> configs);
+        bool WriteConfigs(Dictionary<string, dynamic> configs);
+
         /// <summary>
         /// Deletes the configs.
         /// </summary>

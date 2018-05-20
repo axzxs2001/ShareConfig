@@ -45,36 +45,6 @@ namespace ConsulShareConfig
             _client = new HttpClient();
             _client.BaseAddress = new Uri($"{baseAddress}");
         }
-        /// <summary>
-        /// Ininitializenit configs from data persistence
-        /// </summary>
-        /// <returns></returns>
-        private async Task<bool> Iinitializenit()
-        {
-            var dataConfigs = _dataPersistence?.ReadConfigs();
-            if (dataConfigs == null)
-            {
-                return false;
-            }
-            else
-            {
-                //read consul configs
-                var consulConfigs = await Read();
-                //consul configs is null
-                if (consulConfigs.Count == 0)
-                {
-                    foreach (var config in dataConfigs)
-                    {
-                        var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = config.Key, DC = null }, config.Value);
-                        if (result.result == false || result.createUpdateResult == false)
-                        {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
-        }
 
         /// <summary>
         /// Read Config
@@ -110,6 +80,44 @@ namespace ConsulShareConfig
 
             return backList;
         }
+
+
+        /// <summary>
+        /// write config
+        /// </summary>
+        /// <typeparam name="T">configuration value type</typeparam>
+        /// <param name="key">configuration key</param>
+        /// <param name="value">configuration value</param>
+        /// <returns></returns>
+        public async Task<bool> Write<T>(Key key, T value) where T : class, new()
+        {
+            //data persistence write all
+            if (_dataPersistence != null)
+            {
+                var configs = await Read(key: new Key());
+                configs.Add(key, value);
+                var newConfigs = new Dictionary<string, dynamic>();
+                foreach(var item in configs)
+                {
+                    newConfigs.Add(item.Key.ToString(), item.Value);
+                }
+                _dataPersistence.WriteConfigs(newConfigs);
+            }
+            //consul write one
+            var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = key.ToString(), DC = null }, value);
+            return result.result && result.createUpdateResult;
+        }
+        /// <summary>
+        /// remove config
+        /// </summary>
+        /// <param name="key">configuration key</param>
+        /// <returns></returns>
+        public async Task<bool> Remove(Key key)
+        {
+            return await RemoveKey(key.ToString());
+        }
+
+        #region 私有成员
         /// <summary>
         /// Handle key string to consul query key
         /// </summary>
@@ -150,6 +158,36 @@ namespace ConsulShareConfig
             }
             return queryKey;
         }
+        /// <summary>
+        /// Ininitializenit configs from data persistence
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> Iinitializenit()
+        {
+            var dataConfigs = _dataPersistence?.ReadConfigs();
+            if (dataConfigs == null)
+            {
+                return false;
+            }
+            else
+            {
+                //read consul configs
+                var consulConfigs = await Read(key:"");
+                //consul configs is null
+                if (consulConfigs.Count == 0)
+                {
+                    foreach (var config in dataConfigs)
+                    {
+                        var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = config.Key, DC = null }, config.Value);
+                        if (result.result == false || result.createUpdateResult == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
 
         async Task<List<ReadKeyResult>> ReadKey(string keyUrl)
         {
@@ -161,7 +199,7 @@ namespace ConsulShareConfig
                 var backList = new List<ReadKeyResult>();
                 foreach (var item in list)
                 {
-                    var value =await  ReadKey(item);
+                    var value = await ReadKey(item);
                     backList.AddRange(value);
                 }
                 return backList;
@@ -175,42 +213,15 @@ namespace ConsulShareConfig
             }
         }
 
-
-        /// <summary>
-        /// write config
-        /// </summary>
-        /// <typeparam name="T">configuration value type</typeparam>
-        /// <param name="key">configuration key</param>
-        /// <param name="value">configuration value</param>
-        /// <returns></returns>
-        public async Task<bool> Write<T>(Key key, T value) where T : class, new()
+        private async Task<bool> RemoveKey(string key)
         {
-            //data persistence write all
-            if (_dataPersistence != null)
-            {
-                var configs = await Read();
-                configs.Add(key, value);
-                _dataPersistence.WriteConfigs(configs);
-            }
-            //consul write one
-            var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = key.ToString(), DC = null }, value);
-            return result.result && result.createUpdateResult;
-        }
-        /// <summary>
-        /// remove config
-        /// </summary>
-        /// <param name="key">configuration key</param>
-        /// <returns></returns>
-        public async Task<bool> Remove(Key key)
-        {   
             //data persistence delete key
             if (_dataPersistence != null)
             {
-                _dataPersistence.DeleteConfig(key.ToString());
+                _dataPersistence.DeleteConfig(key);
             }
-            //consul remove
-            var keyString = key.ToString();
-            var keyStrArr = keyString.Split(new string[] { Key.RegxString }, StringSplitOptions.RemoveEmptyEntries);
+            //consul remove            
+            var keyStrArr = key.Split(new string[] { Key.RegxString }, StringSplitOptions.RemoveEmptyEntries);
             var backResult = true;
             if (keyStrArr.Length > 0)
             {
@@ -218,7 +229,7 @@ namespace ConsulShareConfig
                 list.AddRange(await ReadKey(keyStrArr[0]));
                 foreach (var item in list)
                 {
-                    var reg = new Regex($"^{keyString}$");
+                    var reg = new Regex($"^{key}$");
                     if (reg.IsMatch(item.Key))
                     {
                         var result = await DeleteKey(new DeleteKeyParmeter { Key = item.Key });
@@ -228,8 +239,6 @@ namespace ConsulShareConfig
             }
             return backResult;
         }
-
-
 
         /// <summary>
         /// This endpoint returns the specified key. If no key exists at the given path, a 404 is returned instead of a 200 response.For multi-key reads, please consider using transaction.
@@ -346,6 +355,61 @@ namespace ConsulShareConfig
             }
             var backEntity = JsonConvert.DeserializeObject<bool>(backResult.backJson);
             return (backResult.result, backEntity);
+        }
+        #endregion
+
+        /// <summary>
+        /// Read Config
+        /// </summary>
+        /// <typeparam name="T">configuration value type</typeparam>
+        /// <param name="key">configuration key</param>
+        /// <returns></returns>
+        public async Task<Dictionary<string, dynamic>> Read(string key = null)
+        {
+            var keyString = key == null ? new Key().ToString() : key.ToString();
+            var queryKey = HandleQueryKey(keyString);
+            var backList = new Dictionary<string, dynamic>();
+            var list = new List<ReadKeyResult>();
+            list.AddRange(await ReadKey(queryKey));
+            foreach (var item in list)
+            {
+                var reg = new Regex($"^{keyString}$");
+                if (reg.IsMatch(item.Key))
+                {              
+                    backList.Add(item.Key, JsonConvert.DeserializeObject(item.DecodeValue));
+                }
+            }
+            return backList;
+        }
+        /// <summary>
+        /// remove config
+        /// </summary>
+        /// <param name="key">configuration key</param>
+        /// <returns></returns>
+        public async Task<bool> Remove(string key)
+        {
+            return await RemoveKey(key);
+        }
+
+        /// <summary>
+        /// write config
+        /// </summary>
+        /// <typeparam name="T">configuration value type</typeparam>
+        /// <param name="key">configuration key</param>
+        /// <param name="value">configuration value</param>
+        /// <returns></returns>
+        public async Task<bool> Write<T>(string key, T value) where T : class, new()
+        {
+            //data persistence write all
+            if (_dataPersistence != null)
+            {
+                var configs = await Read(key: "");
+                configs.Add(key, value);
+                _dataPersistence.WriteConfigs(configs);
+            }
+            //consul write one
+            var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = key.ToString(), DC = null }, value);
+            return result.result && result.createUpdateResult;
         }
     }
 }

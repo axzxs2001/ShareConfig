@@ -45,7 +45,7 @@ namespace ShareConfig.DataPersistence.Sqlite
         /// </summary>
         /// <param name="configs">configs</param>
         /// <returns></returns>
-        public bool WriteConfigs(Dictionary<Key, dynamic> configs)
+        public bool WriteConfigs(Dictionary<string, dynamic> configs)
         {
             using (var con = new SqliteConnection(_connectionString))
             {
@@ -79,7 +79,7 @@ END
                     {
                         cmd.CommandText = "INSERT INTO Configs(Key,Value) Values(@Key,@Value)";
                         cmd.Parameters.Clear();
-                        cmd.Parameters.Add(new SqliteParameter("@Key", item.Key.ToString()));
+                        cmd.Parameters.Add(new SqliteParameter("@Key", item.Key));
                         cmd.Parameters.Add(new SqliteParameter(name: "@Value",value: Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object)));
                         cmd.ExecuteNonQuery();
                     }                  

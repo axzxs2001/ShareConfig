@@ -178,8 +178,8 @@ namespace ConsoleSample
 
 			var key = new Key { NameSpace = "ns", Environment = "pro", Version = "1.0", Tag = "His" };
 			var value = new { Name = "Gui Suwei", Age = 18, Sex = false };
-			var dic = new Dictionary<Key, dynamic>();
-			dic.Add(key, value);
+			var dic = new Dictionary<string, dynamic>();
+			dic.Add(key.ToString(), value);
 			var result = dataPersistence.WriteConfigs(dic);
 			Console.WriteLine(result);
 		}

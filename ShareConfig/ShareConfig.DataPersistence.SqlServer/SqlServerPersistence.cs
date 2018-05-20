@@ -48,7 +48,7 @@ namespace ShareConfig.DataPersistence.SqlServer
         /// </summary>
         /// <param name="configs">configs</param>
         /// <returns></returns>
-        public bool WriteConfigs(Dictionary<Key, dynamic> configs)
+        public bool WriteConfigs(Dictionary<string, dynamic> configs)
         {
             using (var con = new SqlConnection(_connectionString))
             {
@@ -84,7 +84,7 @@ END
                     foreach (var item in configs)
                     {
                         var row = table.NewRow();
-                        row["key"] = item.Key.ToString();
+                        row["key"] = item.Key;
                         row["value"] = Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object);
                         table.Rows.Add(row);
                     }

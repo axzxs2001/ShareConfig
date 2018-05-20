@@ -40,7 +40,7 @@ namespace ShareConfig.DataPersistence.Redis
         /// </summary>
         /// <param name="configs">configs</param>
         /// <returns></returns>
-        public bool WriteConfigs(Dictionary<Key, dynamic> configs)
+        public bool WriteConfigs(Dictionary<string, dynamic> configs)
         {
             using (var redis = ConnectionMultiplexer.Connect(_connectionString))
             {
@@ -49,11 +49,12 @@ namespace ShareConfig.DataPersistence.Redis
                 var list = new List<KeyValuePair<RedisKey, RedisValue>>();
                 foreach (var item in configs)
                 {
-                    dataBase.StringSet(item.Key.ToString(), Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object));
+                    dataBase.StringSet(item.Key, Newtonsoft.Json.JsonConvert.SerializeObject(item.Value as object));
                 }
                 return true;
             }
         }
+
         /// <summary>
         /// Deletes the config.
         /// </summary>
