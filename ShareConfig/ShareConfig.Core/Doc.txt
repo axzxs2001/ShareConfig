@@ -1,5 +1,5 @@
 ﻿一、方法
-1、持久化层加载（ReadAll），全部保存(WriteAll)，删除单个(DeleteOne)
+1、持久化层加载（ReadConfigs），全部保存(WriteConfigs)，删除单个(DeleteConfig)
 2、配置中心的读(按Key匹配)，写(WriteAll or One)，删除（One）
 二、流程
 1、配置层实例化时可选择是否加载持久化层

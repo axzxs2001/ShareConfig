@@ -23,36 +23,27 @@ namespace ConsulShareConfig
         /// <summary>
         /// ctor
         /// </summary>
-        public ConsulConfig()
-        {
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri($"http://localhost:8500");
-        }
-        /// <summary>
-        /// ctor
-        /// </summary>
-        public ConsulConfig(IDataPersistence dataPersistence = null)
-        {
-            _dataPersistence = dataPersistence;
-            _client = new HttpClient();
-            _client.BaseAddress = new Uri($"http://localhost:8500");
-        }
-        /// <summary>
-        /// ctor
-        /// </summary>
         /// <param name="baseAddress">Base Address，Default value is "http://localhost:8500"</param>
-        public ConsulConfig(string baseAddress = "http://localhost:8500", IDataPersistence dataPersistence = null)
+        public ConsulConfig(string baseAddress = "http://localhost:8500", IDataPersistence dataPersistence = null, bool isLoadConfigs = true)
         {
             _dataPersistence = dataPersistence;
             _client = new HttpClient();
             _client.BaseAddress = new Uri($"{baseAddress}");
+            if (isLoadConfigs)
+            {
+                LoadConfig().GetAwaiter().GetResult();
+            }
         }
         #endregion
 
-        //TODO 同步配置与数据实现
+
+
+        /// <summary>
+        ///同步配置与数据实现
+        /// </summary>
         public void Dispose()
         {
-            throw new NotImplementedException();
+            PersistenceConfigs().GetAwaiter().GetResult();
         }
 
         #region Key类型 
@@ -186,13 +177,62 @@ namespace ConsulShareConfig
         /// </summary>
         /// <param name="configs">configs</param>
         /// <returns></returns>
-        public async Task<bool> WriteAll(Dictionary<string,dynamic> configs)
+        public async Task<bool> WriteAll(Dictionary<string, dynamic> configs)
         {
-            //TODO no coding
-            return false;
+            foreach (var item in configs)
+            {
+                var result = await Write(item.Key, item.Value);
+                if (result == false)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
         #endregion
         #region 私有成员
+        /// <summary>
+        /// Load configs from data persistence
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> LoadConfig()
+        {
+            var dataConfigs = _dataPersistence?.ReadConfigs();
+            if (dataConfigs == null)
+            {
+                return false;
+            }
+            else
+            {
+                //read consul configs
+                var consulConfigs = await Read(key: "");
+                //consul configs is null
+                if (consulConfigs.Count == 0)
+                {
+                    foreach (var config in dataConfigs)
+                    {
+                        var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = config.Key, DC = null }, config.Value);
+                        if (result.result == false || result.createUpdateResult == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// 持久化配置文件
+        /// </summary>
+        /// <returns></returns>
+        private async Task<bool> PersistenceConfigs()
+        {
+            var configs = await Read("");
+            return _dataPersistence.WriteConfigs(configs);
+        }
+
+
         /// <summary>
         /// Handle key string to consul query key
         /// </summary>
@@ -232,36 +272,6 @@ namespace ConsulShareConfig
                 }
             }
             return queryKey;
-        }
-        /// <summary>
-        /// Load configs from data persistence
-        /// </summary>
-        /// <returns></returns>
-        private async Task<bool> LoadConfig()
-        {
-            var dataConfigs = _dataPersistence?.ReadConfigs();
-            if (dataConfigs == null)
-            {
-                return false;
-            }
-            else
-            {
-                //read consul configs
-                var consulConfigs = await Read(key: "");
-                //consul configs is null
-                if (consulConfigs.Count == 0)
-                {
-                    foreach (var config in dataConfigs)
-                    {
-                        var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = config.Key, DC = null }, config.Value);
-                        if (result.result == false || result.createUpdateResult == false)
-                        {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
         }
 
         async Task<List<ReadKeyResult>> ReadKey(string keyUrl)
@@ -433,7 +443,7 @@ namespace ConsulShareConfig
         }
 
         #endregion
-     
+
 
     }
 }
