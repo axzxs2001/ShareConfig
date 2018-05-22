@@ -204,18 +204,12 @@ namespace ConsulShareConfig
             }
             else
             {
-                //read consul configs
-                var consulConfigs = await Read(key: "");
-                //consul configs is null
-                if (consulConfigs.Count == 0)
+                foreach (var config in dataConfigs)
                 {
-                    foreach (var config in dataConfigs)
+                    var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = config.Key, DC = null }, config.Value);
+                    if (result.result == false || result.createUpdateResult == false)
                     {
-                        var result = await CreateUpdateKey(new CreateUpdateKeyParmeter { Key = config.Key, DC = null }, config.Value);
-                        if (result.result == false || result.createUpdateResult == false)
-                        {
-                            return false;
-                        }
+                        return false;
                     }
                 }
                 return true;
